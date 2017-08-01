@@ -28,7 +28,10 @@ function findOrCreatePropertyInstance(propertyClass, context, key) {
   if (context instanceof Ember.Component) {
     // in case component would be destroyed
     // we need to destroy computed property as well
-    context.one('willDestroyElement', () => property.destroy());
+    context.one('willDestroyElement', () => {
+      property.destroy();
+      PROPERTIES.get(context)[key] = undefined;
+    });
   }
 
   return property;
@@ -57,6 +60,8 @@ ClassBasedComputedProperty.reopenClass({
             property.destroy();
             //also there is no longer need to check it
             this.removeObserver(key, isComputedPropertyOrphaned);
+
+            PROPERTIES.get(this)[key] = undefined;
           }
         };
 
